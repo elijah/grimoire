@@ -1073,6 +1073,9 @@
       "readingDesc": "Leseverhalten, Bibliotheksansicht und Feeds.",
       "security": "Sicherheit & Konto",
       "securityDesc": "Passwort, aktive Sitzungen und Kontolöschung."
+    },
+    "demoMode": {
+      "notice": "Dies ist ein Demoserver. Die Kontoeinstellungen sind für Demokonten schreibgeschützt, und alle von dir erstellten Kampagnen werden stündlich automatisch entfernt."
     }
   },
   "appSettings": {

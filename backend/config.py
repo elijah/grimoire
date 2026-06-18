@@ -212,6 +212,14 @@ _MEDIA_FILE_CACHE_HEADERS = {"Cache-Control": "private, max-age=300"}
 # "private" — a shared proxy must never hand one user's thumbnail to another.
 _THUMBNAIL_CACHE_HEADERS = {"Cache-Control": "private, no-cache"}
 
+# When true, the server runs in demo mode: non-admin users (player/gm) cannot
+# perform any action on their account settings page (changing display name,
+# email, preferences, password, OPDS tokens, or deleting their account), and
+# every hour all campaigns owned by non-admin accounts are deleted. Admin
+# accounts are unaffected and retain full access. Intended for public demo
+# deployments.
+ENABLE_DEMO_MODE = os.environ.get("ENABLE_DEMO_MODE", "false").lower() == "true"
+
 # Optional override for password authentication. When the env var is set,
 # it pins the value and the admin UI shows a read-only state. When unset,
 # the corresponding DB setting (password_auth_enabled) is used.

@@ -1073,6 +1073,9 @@
       "readingDesc": "Comportement du lecteur, navigation dans la bibliothèque et flux.",
       "security": "Sécurité et compte",
       "securityDesc": "Mot de passe, sessions actives et suppression du compte."
+    },
+    "demoMode": {
+      "notice": "Ceci est un serveur de démonstration. Les paramètres du compte sont en lecture seule pour les comptes de démonstration, et toutes les campagnes que vous créez sont automatiquement supprimées chaque heure."
     }
   },
   "appSettings": {

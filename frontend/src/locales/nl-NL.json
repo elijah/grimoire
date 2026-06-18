@@ -1073,6 +1073,9 @@
       "readingDesc": "Lezergedrag, bladeren door de bibliotheek en feeds.",
       "security": "Beveiliging en account",
       "securityDesc": "Wachtwoord, actieve sessies en accountverwijdering."
+    },
+    "demoMode": {
+      "notice": "Dit is een demoserver. Accountinstellingen zijn alleen-lezen voor demo-accounts en alle campagnes die je aanmaakt worden elk uur automatisch verwijderd."
     }
   },
   "appSettings": {

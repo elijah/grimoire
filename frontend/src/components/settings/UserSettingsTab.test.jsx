@@ -2,6 +2,7 @@ import { describe, it, expect, vi, beforeEach } from 'vitest'
 import { render, screen } from '@testing-library/react'
 import userEvent from '@testing-library/user-event'
 import UserSettingsTab from './UserSettingsTab'
+import { UISettingsProvider } from '../../context/UISettingsContext'
 
 // Each section is covered by its own test file; stub them so this one asserts
 // the tab's composition and ordering rather than re-testing their internals.
@@ -100,5 +101,42 @@ describe('UserSettingsTab', () => {
     expect(screen.queryByText('email')).not.toBeInTheDocument()
     expect(screen.getByText('reader')).toBeInTheDocument()
     expect(screen.getByText('password')).toBeInTheDocument()
+  })
+})
+
+// Demo mode: a public demo instance freezes non-admin account settings behind a
+// disabled fieldset so visitors can look around without editing the account.
+describe('UserSettingsTab — demo mode lockdown', () => {
+  beforeEach(() => localStorage.clear())
+
+  function renderTab(uiSettings, user) {
+    return render(
+      <UISettingsProvider value={uiSettings}>
+        <UserSettingsTab user={user} onLogout={() => {}} />
+      </UISettingsProvider>
+    )
+  }
+
+  it('disables all account actions for a non-admin when demo mode is on', () => {
+    const { container } = renderTab({ demo_mode: true }, { role: 'player', username: 'p' })
+    expect(container.querySelector('fieldset')).toBeDisabled()
+    expect(screen.getByText('userSettings.demoMode.notice')).toBeInTheDocument()
+  })
+
+  it('locks gm accounts too', () => {
+    const { container } = renderTab({ demo_mode: true }, { role: 'gm', username: 'g' })
+    expect(container.querySelector('fieldset')).toBeDisabled()
+  })
+
+  it('does not lock admin accounts in demo mode', () => {
+    const { container } = renderTab({ demo_mode: true }, { role: 'admin', username: 'a' })
+    expect(container.querySelector('fieldset')).not.toBeDisabled()
+    expect(screen.queryByText('userSettings.demoMode.notice')).not.toBeInTheDocument()
+  })
+
+  it('does not lock non-admins when demo mode is off', () => {
+    const { container } = renderTab({ demo_mode: false }, { role: 'player', username: 'p' })
+    expect(container.querySelector('fieldset')).not.toBeDisabled()
+    expect(screen.queryByText('userSettings.demoMode.notice')).not.toBeInTheDocument()
   })
 })

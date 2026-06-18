@@ -1073,6 +1073,9 @@
       "readingDesc": "Comportamento do leitor, navegação na biblioteca e feeds.",
       "security": "Segurança e conta",
       "securityDesc": "Senha, sessões ativas e exclusão da conta."
+    },
+    "demoMode": {
+      "notice": "Este é um servidor de demonstração. As configurações da conta são somente leitura para contas de demonstração, e todas as campanhas que você criar são removidas automaticamente a cada hora."
     }
   },
   "appSettings": {

@@ -6,6 +6,7 @@ const UISettingsContext = createContext({
   hide_audio: false,
   hide_models: false,
   hide_campaigns: false,
+  demo_mode: false,
   campaign_uploads_disabled: false,
   campaign_upload_max_file_mb: 0,
   campaign_upload_max_total_mb: 0,

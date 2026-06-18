@@ -11,12 +11,13 @@ from sqlalchemy import text
 
 from slowapi import _rate_limit_exceeded_handler
 
-from . import backup_scheduler, scheduler, session_creator, session_purger
+from . import backup_scheduler, demo, scheduler, session_creator, session_purger
 from ._health_schemas import HealthResponse
 from .auth import get_current_user
 from .security import RateLimitExceeded, SecurityHeadersMiddleware, limiter
 from .config import (
     DATA_PATH,
+    ENABLE_DEMO_MODE,
     LIBRARY_PATH,
     OPDS_ENABLED,
     SessionLocal,
@@ -226,6 +227,8 @@ async def lifespan(app: FastAPI):
         # Trims dead auth_sessions rows so the table stays bounded (issue #157).
         # Self-limits to one worker via its own lock.
         session_purger.start(DATA_PATH)
+        if ENABLE_DEMO_MODE:
+            demo.start()
 
     yield
 

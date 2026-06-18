@@ -1073,6 +1073,9 @@
       "readingDesc": "Reader behaviour, library browsing, and feeds.",
       "security": "Security & Account",
       "securityDesc": "Password, active sessions, and account removal."
+    },
+    "demoMode": {
+      "notice": "This is a demo server. Account settings are read-only for demo accounts, and any campaigns you create are automatically removed every hour."
     }
   },
   "appSettings": {
