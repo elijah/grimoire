@@ -7,6 +7,7 @@ and re-exported here so callers can keep using ``from backend.models import X``.
 from .access import UserAccessGrant
 from .audio_sets import SET_TYPES, AudioSet
 from .base import Base
+from .characters import Character, CharacterSchema
 from .campaigns import (
     Campaign,
     CampaignCategory,
@@ -91,6 +92,9 @@ __all__ = [
     # Saved audio sets
     "AudioSet",
     "SET_TYPES",
+    # Characters
+    "CharacterSchema",
+    "Character",
     # Campaigns
     "Campaign",
     "CampaignMember",
