@@ -370,6 +370,14 @@ class AddonManifest(BaseModel):
                 raise ValueError("a 'source' manifest needs 'search.fields'")
         return self
 
+    @model_validator(mode="after")
+    def library_kind_requires_owned_resource(self) -> "AddonManifest":
+        if self.kind == "library" and self.target != "owned-resource":
+            raise ValueError("library add-ons must target 'owned-resource'")
+        if self.kind == "scraper" and self.target not in ("game-system", "book"):
+            raise ValueError("scraper add-ons must target 'game-system' or 'book'")
+        return self
+
     @property
     def requires_script(self) -> bool:
         return self.script is not None
