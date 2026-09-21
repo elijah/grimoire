@@ -179,6 +179,87 @@ class TestManifestValidation:
 
 
 # ---------------------------------------------------------------------------
+# Library add-on kind and owned-resource target
+# ---------------------------------------------------------------------------
+
+
+class TestLibraryAddonKind:
+    """The new `library` kind and `owned-resource` target extend the add-on
+    system to support add-ons that track owned RPG resources rather than
+    scrape metadata."""
+
+    LIBRARY_VALID = {
+        "id": "demo",
+        "name": "Demo",
+        "version": "1.0.0",
+        "kind": "library",
+        "target": "owned-resource",
+        "script": {"entry": "demo.py"},
+    }
+
+    def test_library_kind_manifest_loads(self):
+        manifest = AddonManifest(**self.LIBRARY_VALID)
+        assert manifest.kind == "library"
+        assert manifest.target == "owned-resource"
+        assert manifest.requires_script
+
+    def test_library_kind_with_game_system_target_is_rejected(self):
+        with pytest.raises(ValidationError):
+            AddonManifest(
+                **{
+                    **self.LIBRARY_VALID,
+                    "target": "game-system",
+                }
+            )
+
+    def test_library_kind_with_book_target_is_rejected(self):
+        with pytest.raises(ValidationError):
+            AddonManifest(
+                **{
+                    **self.LIBRARY_VALID,
+                    "target": "book",
+                }
+            )
+
+    def test_library_kind_without_source_or_script_is_rejected(self):
+        bare = {k: v for k, v in self.LIBRARY_VALID.items() if k not in ("script",)}
+        with pytest.raises(ValidationError, match="source.*script"):
+            AddonManifest(**bare)
+
+    def test_library_kind_with_script_and_no_source_loads(self):
+        manifest = AddonManifest(**self.LIBRARY_VALID)
+        assert manifest.requires_script
+        assert manifest.source is None
+        assert manifest.script is not None
+
+    def test_library_kind_rejects_map_fields(self):
+        """owned-resource has no mappable fields; library add-ons create new
+        Book records via sync/download/scan actions rather than mapping
+        fields onto existing entities."""
+        with pytest.raises(ValidationError, match="not valid for target"):
+            AddonManifest(
+                **{
+                    **self.LIBRARY_VALID,
+                    "map": {"title": {"from": "x"}},
+                }
+            )
+
+    def test_library_kind_mappable_fields_is_empty(self):
+        manifest = AddonManifest(**self.LIBRARY_VALID)
+        assert manifest.mappable_fields == ()
+
+    def test_scraper_kind_with_owned_resource_target_is_rejected(self):
+        with pytest.raises(ValidationError):
+            AddonManifest(
+                **{
+                    **VALID,
+                    "kind": "scraper",
+                    "target": "owned-resource",
+                }
+            )
+
+
+# ---------------------------------------------------------------------------
 # Discovery
 # ---------------------------------------------------------------------------
 
@@ -351,6 +432,41 @@ class TestEnabledForTarget:
         _write_addon(addons_dir, "alpha")
         assert [m.id for m in registry.enabled_for_target(db, "game-system")] == ["alpha"]
 
+    def test_returns_matching_library_addons_for_owned_resource_target(self, db, addons_dir):
+        _write_addon(
+            addons_dir,
+            "library-addon",
+            manifest={
+                "id": "library-addon",
+                "name": "Library Addon",
+                "version": "1.0.0",
+                "kind": "library",
+                "target": "owned-resource",
+                "script": {"entry": "demo.py"},
+            },
+            script="demo.py",
+        )
+        registry.set_scripts_allowed(db, True)
+        registry.update_state_for(db, "library-addon", script_approved=True)
+        db.commit()
+        assert [m.id for m in registry.enabled_for_target(db, "owned-resource")] == ["library-addon"]
+
+    def test_excludes_library_addons_from_game_system_target(self, db, addons_dir):
+        _write_addon(
+            addons_dir,
+            "library-addon",
+            manifest={
+                "id": "library-addon",
+                "name": "Library Addon",
+                "version": "1.0.0",
+                "kind": "library",
+                "target": "owned-resource",
+                "script": {"entry": "demo.py"},
+            },
+            script="demo.py",
+        )
+        assert registry.enabled_for_target(db, "game-system") == []
+
     def test_excludes_disabled(self, db, addons_dir):
         _write_addon(addons_dir, "alpha")
         registry.update_state_for(db, "alpha", enabled=False)
@@ -428,6 +544,13 @@ def test_state_is_stored_as_json_in_app_settings(db):
     db.commit()
     row = db.query(AppSetting).filter_by(key=SETTING_INSTALLED).first()
     assert json.loads(row.value)["demo"]["version"] == "2.0.0"
+
+
+def test_mappable_by_target_includes_owned_resource():
+    from backend.addons.manifest import MAPPABLE_BY_TARGET
+
+    assert "owned-resource" in MAPPABLE_BY_TARGET
+    assert MAPPABLE_BY_TARGET["owned-resource"] == ()
 
 
 def test_addons_dir_is_under_data_path():
