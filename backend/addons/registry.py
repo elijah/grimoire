@@ -235,10 +235,10 @@ def is_runnable(db: Session, addon_id: str, manifest: AddonManifest) -> tuple[bo
 
 
 def enabled_for_target(db: Session, target: str = "game-system") -> list[AddonManifest]:
-    """Installed, enabled, runnable scrapers for a given target entity."""
+    """Installed, enabled, runnable add-ons for a given target entity."""
     out = []
     for addon_id, manifest in load_all().items():
-        if manifest.kind != "scraper" or manifest.target != target:
+        if manifest.kind not in ("scraper", "library") or manifest.target != target:
             continue
         ok, _ = is_runnable(db, addon_id, manifest)
         if ok:

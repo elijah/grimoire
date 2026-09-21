@@ -76,6 +76,7 @@ MAPPABLE_BOOK_FIELDS = (
 MAPPABLE_BY_TARGET: dict[str, tuple[str, ...]] = {
     "game-system": MAPPABLE_SYSTEM_FIELDS,
     "book": MAPPABLE_BOOK_FIELDS,
+    "owned-resource": (),
 }
 
 # Backwards-compatible alias: the original name referred to system fields.
@@ -305,8 +306,8 @@ class AddonManifest(BaseModel):
     id: str
     name: str
     version: str
-    kind: Literal["scraper"]
-    target: Literal["game-system", "book"] = "game-system"
+    kind: Literal["scraper", "library"]
+    target: Literal["game-system", "book", "owned-resource"] = "game-system"
     description: str = ""
     homepage: str = ""
     # Who wrote the add-on. A GitHub username (optionally "@name"), or a plain
