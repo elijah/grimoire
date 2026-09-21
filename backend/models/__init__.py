@@ -8,7 +8,7 @@ from .access import UserAccessGrant
 from .audio_sets import SET_TYPES, AudioSet
 from .base import Base
 from .characters import Character, CharacterSchema
-from .content import HOMEBREW_VISIBILITY, ContentEntry, ContentPack, HomebrewEntry
+from .content import ContentEntry, ContentPack, Ruleset, RulesetEntry
 from .campaigns import (
     Campaign,
     CampaignCategory,
@@ -99,8 +99,8 @@ __all__ = [
     # Character content catalog
     "ContentPack",
     "ContentEntry",
-    "HomebrewEntry",
-    "HOMEBREW_VISIBILITY",
+    "Ruleset",
+    "RulesetEntry",
     # Campaigns
     "Campaign",
     "CampaignMember",
